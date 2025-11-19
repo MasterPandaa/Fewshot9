@@ -1,5 +1,6 @@
-import sys
 import random
+import sys
+
 import pygame
 
 # ========== Konfigurasi Utama ==========
@@ -63,8 +64,12 @@ class Ball:
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.vx = 0.0
         self.vy = 0.0
-        self.serve_direction = random.choice([-1, 1])  # arah awal acak (-1 kiri, 1 kanan)
-        self.frozen_until = 0  # waktu (ms) sampai bola mulai bergerak (untuk jeda setelah skor)
+        self.serve_direction = random.choice(
+            [-1, 1]
+        )  # arah awal acak (-1 kiri, 1 kanan)
+        self.frozen_until = (
+            0  # waktu (ms) sampai bola mulai bergerak (untuk jeda setelah skor)
+        )
 
     def reset(self, serve_direction=None, now_ms=0):
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -81,6 +86,7 @@ class Ball:
     def clamp_speed(self):
         # Batasi kecepatan resultant
         import math
+
         mag = math.hypot(self.vx, self.vy)
         if mag > BALL_MAX_SPEED:
             scale = BALL_MAX_SPEED / mag
@@ -108,7 +114,9 @@ class Ball:
 
 
 # ========== Fungsi Utilitas Gambar ==========
-def draw_center_dashed_line(surface, color=(200, 200, 200), dash_height=10, gap=10, width=2):
+def draw_center_dashed_line(
+    surface, color=(200, 200, 200), dash_height=10, gap=10, width=2
+):
     x = SCREEN_WIDTH // 2 - width // 2
     y = 0
     while y < SCREEN_HEIGHT:
@@ -124,8 +132,15 @@ def main():
     font = pygame.font.SysFont(None, SCORE_FONT_SIZE)
 
     # Objek permainan
-    player = Paddle(30, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
-    ai = Paddle(SCREEN_WIDTH - 30 - PADDLE_WIDTH, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
+    player = Paddle(
+        30, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT
+    )
+    ai = Paddle(
+        SCREEN_WIDTH - 30 - PADDLE_WIDTH,
+        SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2,
+        PADDLE_WIDTH,
+        PADDLE_HEIGHT,
+    )
     ball = Ball()
     ball.reset(now_ms=pygame.time.get_ticks())
 
@@ -174,7 +189,8 @@ def main():
             if scored == "left":
                 serve_dir = -1  # kiri mencetak, bola ke kanan (AI kebobolan)
             else:
-                serve_dir = 1   # kanan mencetak, bola ke kiri (pemain kebobolan)
+                # kanan mencetak, bola ke kiri (pemain kebobolan)
+                serve_dir = 1
             ball.serve_direction = serve_dir
             ball.reset(serve_direction=serve_dir, now_ms=now)
 
@@ -189,7 +205,9 @@ def main():
                 ball.rect.left = player.rect.right
 
             # Hit angle berdasarkan offset relatif
-            offset = (ball.rect.centery - player.rect.centery) / (player.rect.height / 2)
+            offset = (ball.rect.centery - player.rect.centery) / (
+                player.rect.height / 2
+            )
             # Semakin jauh dari tengah, semakin besar sudut
             ball.vx = abs(ball.vx) + BALL_SPEED_INCREMENT
             ball.vy = (BALL_BASE_SPEED + abs(ball.vx) * 0.3) * offset
@@ -229,7 +247,9 @@ def main():
         # Indikator "READY" saat serve delay
         if now < ball.frozen_until:
             ready_surf = font.render("READY", True, (200, 200, 200))
-            ready_rect = ready_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
+            ready_rect = ready_surf.get_rect(
+                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80)
+            )
             screen.blit(ready_surf, ready_rect)
 
         pygame.display.flip()
